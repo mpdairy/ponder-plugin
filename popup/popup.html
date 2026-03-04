@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup">
+    <div class="popup__header">
+      <h1 class="popup__title">Ponder</h1>
+      <label class="popup__toggle">
+        <input type="checkbox" id="enabled" checked>
+        <span class="popup__toggle-slider"></span>
+      </label>
+    </div>
+    <p class="popup__desc">Pause interval</p>
+    <div class="popup__inputs">
+      <label class="popup__field">
+        <input type="number" id="minutes" min="0" max="120" value="3">
+        <span>min</span>
+      </label>
+      <label class="popup__field">
+        <input type="number" id="seconds" min="0" max="59" value="0">
+        <span>sec</span>
+      </label>
+    </div>
+    <div id="status" class="popup__status"></div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

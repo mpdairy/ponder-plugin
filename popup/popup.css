@@ -1,0 +1,121 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  min-width: 240px;
+}
+
+.popup {
+  padding: 20px;
+}
+
+.popup__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.popup__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4caf50;
+}
+
+/* Toggle switch */
+.popup__toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.popup__toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.popup__toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #333;
+  border-radius: 22px;
+  transition: background 0.2s;
+}
+
+.popup__toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: #e0e0e0;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.popup__toggle input:checked + .popup__toggle-slider {
+  background: #4caf50;
+}
+
+.popup__toggle input:checked + .popup__toggle-slider::before {
+  transform: translateX(18px);
+}
+
+.popup__desc {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 12px;
+}
+
+.popup__inputs {
+  display: flex;
+  gap: 12px;
+}
+
+.popup__field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.popup__field input {
+  width: 56px;
+  padding: 6px 8px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #16213e;
+  color: #e0e0e0;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+}
+
+.popup__field input:focus {
+  border-color: #4caf50;
+}
+
+.popup__field input:disabled {
+  opacity: 0.4;
+}
+
+.popup__field span {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.popup__status {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #4caf50;
+  min-height: 16px;
+}
