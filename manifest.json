@@ -29,6 +29,7 @@
         "core/overlay.js",
         "modules/youtube.js",
         "modules/tubi.js",
+        "modules/odysee.js",
         "core/ponder-timer.js"
       ],
       "run_at": "document_idle"
