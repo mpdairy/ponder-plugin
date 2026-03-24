@@ -2,9 +2,16 @@
  * Ponder module — Nebula
  *
  * Nebula is a creator-owned streaming platform (nebula.tv / nebula.app).
- * It uses a React SPA with client-side routing and a standard HTML5 video
- * player inside a #video-player container. This module uses a
- * MutationObserver + URL polling to handle SPA navigation.
+ * It uses a React SPA with client-side routing and a custom HTML5 video
+ * player inside a #video-player container.
+ *
+ * Key challenges on Nebula:
+ * - SPA navigation: Nebula uses client-side routing, so we poll for URL
+ *   changes and use a MutationObserver for dynamic DOM updates.
+ * - Pausing: Nebula's React player manages playback state internally.
+ *   Calling video.pause() directly can cause the player to get out of
+ *   sync and resume. Instead we click the play/pause button inside
+ *   #video-controls, which goes through the player's normal flow.
  */
 PonderModuleRegistry.register({
   name: 'nebula',
@@ -83,6 +90,22 @@ PonderModuleRegistry.register({
     } else {
       this._currentVideo = video;
       this._callbacks.onVideoFound(video);
+    }
+  },
+
+  pause() {
+    // Click Nebula's own play/pause button. This goes through the player's
+    // normal pause flow so React state stays in sync.
+    // The button's aria-label is "Pause" when playing, "Play" when paused.
+    var btn = document.querySelector('#video-controls button[aria-label="Pause"]') ||
+              document.querySelector('#video-player-controls-wrapper button[aria-label="Pause"]');
+    if (btn) {
+      btn.click();
+      return;
+    }
+    // Fallback: direct pause on the video element
+    if (this._currentVideo) {
+      this._currentVideo.pause();
     }
   },
 
