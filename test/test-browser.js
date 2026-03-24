@@ -480,6 +480,119 @@ async function run() {
     await page.close();
 
     // -----------------------------------------------------------------------
+    // TEST: Nebula
+    // -----------------------------------------------------------------------
+    console.log('\n--- Nebula Test ---');
+    consoleLogs = [];
+    page = await browser.newPage();
+
+    page.on('console', function(msg) {
+      var text = msg.text();
+      if (text.indexOf('[Ponder]') !== -1) {
+        consoleLogs.push(text);
+        console.log('  [console] ' + text);
+      }
+    });
+
+    console.log('  Loading Nebula homepage...');
+    await page.goto('https://nebula.tv', {
+      waitUntil: 'networkidle2',
+      timeout: 30000
+    }).catch(function(e) {
+      console.log('  Nebula homepage load note: ' + e.message);
+    });
+
+    await sleep(2000);
+
+    var nebulaModuleActivated = consoleLogs.some(function(log) {
+      return log.indexOf('Activated module: Nebula') !== -1;
+    });
+    assert(nebulaModuleActivated, 'Nebula: Module activated on nebula.tv');
+
+    // Find a video link to navigate to
+    console.log('  Looking for a video link on Nebula...');
+    var nebulaVideoUrl = await page.evaluate(function() {
+      // Nebula video links typically use /videos/<slug>
+      var links = Array.from(document.querySelectorAll('a[href]'));
+      for (var i = 0; i < links.length; i++) {
+        var href = links[i].href;
+        if (href.match(/nebula\.tv\/videos\/[^/]+/)) {
+          return href;
+        }
+      }
+      return null;
+    });
+
+    if (nebulaVideoUrl) {
+      console.log('  Navigating to Nebula video: ' + nebulaVideoUrl);
+      consoleLogs = [];
+      await page.goto(nebulaVideoUrl, {
+        waitUntil: 'networkidle2',
+        timeout: 30000
+      }).catch(function(e) {
+        console.log('  Nebula video page load note: ' + e.message);
+      });
+
+      await sleep(5000);
+
+      var nebulaVideoExists = await page.evaluate(function() {
+        return document.querySelector('video') !== null;
+      });
+
+      if (nebulaVideoExists) {
+        console.log('  Nebula video element found!');
+        assert(true, 'Nebula: Video element found on video page');
+
+        var nebulaAttached = consoleLogs.some(function(log) {
+          return log.indexOf('Attached to video') !== -1;
+        });
+        assert(nebulaAttached, 'Nebula: Ponder attached to video element');
+
+        // Try to play and test auto-pause
+        console.log('  Starting Nebula video playback...');
+        await page.evaluate(function() {
+          var v = document.querySelector('video');
+          if (v) { v.muted = true; v.play().catch(function() {}); }
+        });
+        await sleep(1500);
+
+        var nebulaIsPlaying = await page.evaluate(function() {
+          var v = document.querySelector('video');
+          return v && !v.paused;
+        });
+        console.log('  Nebula video playing: ' + nebulaIsPlaying);
+
+        if (nebulaIsPlaying) {
+          var nebulaReadyState = await page.evaluate(function() {
+            var v = document.querySelector('video');
+            return v ? v.readyState : -1;
+          });
+
+          if (nebulaReadyState >= 2) {
+            console.log('  Nebula video streaming (readyState=' + nebulaReadyState + '), waiting for auto-pause...');
+            var nebulaPaused = await waitForPause(page, 'video', 10000);
+            assert(nebulaPaused, 'Nebula: Video was auto-paused by Ponder');
+          } else {
+            console.log('  Nebula video not streaming (readyState=' + nebulaReadyState + ')');
+            console.log('  Nebula requires login — cannot test auto-pause in headless.');
+            console.log('  Module activation + video attachment verified above.');
+          }
+        } else {
+          console.log('  Nebula video did not autoplay (may need login or interaction)');
+          assert(nebulaAttached, 'Nebula: Extension attached (autoplay blocked, cannot test pause)');
+        }
+      } else {
+        console.log('  No video element on Nebula video page (may need login)');
+        assert(nebulaModuleActivated, 'Nebula: Module activated (video requires login)');
+      }
+    } else {
+      console.log('  Could not find a video link on Nebula homepage');
+      assert(nebulaModuleActivated, 'Nebula: Module activated (no video link found to test)');
+    }
+
+    await page.close();
+
+    // -----------------------------------------------------------------------
     // TEST: Non-matching site
     // -----------------------------------------------------------------------
     console.log('\n--- Non-matching Site Test ---');

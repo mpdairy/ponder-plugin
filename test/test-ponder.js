@@ -203,11 +203,13 @@ loadScript('core/overlay.js');
 loadScript('modules/youtube.js');
 loadScript('modules/tubi.js');
 loadScript('modules/odysee.js');
+loadScript('modules/nebula.js');
 
 assert(typeof PonderModuleRegistry !== 'undefined', 'PonderModuleRegistry is defined');
 assert(PonderModuleRegistry.list().indexOf('youtube') !== -1, 'YouTube module registered');
 assert(PonderModuleRegistry.list().indexOf('tubi') !== -1, 'Tubi module registered');
 assert(PonderModuleRegistry.list().indexOf('odysee') !== -1, 'Odysee module registered');
+assert(PonderModuleRegistry.list().indexOf('nebula') !== -1, 'Nebula module registered');
 
 // Test 2: Load timer (should find YouTube module since we're on youtube.com)
 loadScript('core/ponder-timer.js');
@@ -317,6 +319,16 @@ assert(odyseeMatchTest('odysee.com'), 'Odysee matches odysee.com');
 assert(odyseeMatchTest('www.odysee.com'), 'Odysee matches www.odysee.com');
 assert(!odyseeMatchTest('www.youtube.com'), 'Odysee does not match youtube.com');
 
+const nebulaMatchTest = function(hostname) {
+  return hostname === 'nebula.tv' || hostname === 'www.nebula.tv' ||
+         hostname === 'nebula.app' || hostname === 'www.nebula.app';
+};
+assert(nebulaMatchTest('nebula.tv'), 'Nebula matches nebula.tv');
+assert(nebulaMatchTest('www.nebula.tv'), 'Nebula matches www.nebula.tv');
+assert(nebulaMatchTest('nebula.app'), 'Nebula matches nebula.app');
+assert(nebulaMatchTest('www.nebula.app'), 'Nebula matches www.nebula.app');
+assert(!nebulaMatchTest('www.youtube.com'), 'Nebula does not match youtube.com');
+
 // Test 8: Load order verification
 console.log('\n--- Load Order Verification ---');
 const manifest = JSON.parse(fs.readFileSync(path.join(baseDir, 'manifest.json'), 'utf-8'));
@@ -325,11 +337,14 @@ const timerIdx = jsFiles.indexOf('core/ponder-timer.js');
 const youtubeIdx = jsFiles.indexOf('modules/youtube.js');
 const tubiIdx = jsFiles.indexOf('modules/tubi.js');
 const odyseeIdx = jsFiles.indexOf('modules/odysee.js');
+const nebulaIdx = jsFiles.indexOf('modules/nebula.js');
 
 assert(timerIdx > youtubeIdx, 'ponder-timer.js loads AFTER youtube.js in manifest');
 assert(timerIdx > tubiIdx, 'ponder-timer.js loads AFTER tubi.js in manifest');
 assert(timerIdx > odyseeIdx, 'ponder-timer.js loads AFTER odysee.js in manifest');
+assert(timerIdx > nebulaIdx, 'ponder-timer.js loads AFTER nebula.js in manifest');
 assert(odyseeIdx !== -1, 'odysee.js is listed in manifest');
+assert(nebulaIdx !== -1, 'nebula.js is listed in manifest');
 
 // ---------------------------------------------------------------------------
 // Summary
